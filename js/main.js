@@ -23,10 +23,9 @@ let currentYear  = 2020;
 // mounts
 const mountMap     = (field, yr) => safeEmbed('#map', mapSpec(field, yr));
 const mountStacked = ()          => safeEmbed('#stacked', stackedSpec);
-const mountStateYearArea = (yr)  => {
-  const useLog = !!el('#logScale')?.checked;
-  return safeEmbed('#stateYearArea', stateYearAreaByState(yr, useLog));
-};
+const mountStateYearArea = (yr) =>
+  safeEmbed('#stateYearArea', stateYearAreaByState(yr));
+
 
 // initial
 mountStateYearArea(currentYear);
