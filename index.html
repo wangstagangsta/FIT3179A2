@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Australia’s Forest Fires 2016–21 — FIT3179 A2</title>
+  <link rel="stylesheet" href="https://unpkg.com/purecss@3.0.0/build/pure-min.css" crossorigin="anonymous">
+  <style>
+    body { font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; color:#111; margin:0; }
+    header { padding:2rem 1rem; border-bottom:1px solid #eee; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 1rem; }
+    h1 { margin:0 0 .25rem 0; font-size: 1.8rem; }
+    .subtle { color:#555; }
+    .card { background:#fff; border:1px solid #eee; border-radius:12px; padding:1rem; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+    .vis { min-height: 340px; width: 100%; }
+    .footer { color:#666; font-size:.9rem; margin-top:2rem; }
+    .control { margin:.5rem 0 1rem; }
+    .kicker { font-size:.95rem; letter-spacing:.02em; color:#666; margin-bottom:.4rem; text-transform:uppercase; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="kicker">FIT3179 • Assignment 2</div>
+      <h1>Australia’s Forest Fires (2016–21)</h1>
+      <p class="subtle">MEOOOOOWWWWWWW</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- =========================================================
+         ROW 1
+         LEFT: A) National trend (line) — user-chosen metric
+         RIGHT: B) States choropleth — % forest burned (year slider)
+         ========================================================= -->
+    <div class="pure-g" style="gap:1rem;">
+
+      <!-- A) National trend (line) -->
+      <section class="pure-u-1 pure-u-md-2-3 card" id="section-statearea">
+        <h2 style="margin-top:0;">Area burned by state — selected year</h2>
+        <p class="subtle" style="margin-top:-.4rem">
+          Grouped bars show forest area burned (hectares) per state. Use the year slider on the right.
+        </p>
+        <div id="stateYearArea" class="vis"></div>
+        <div class="control">
+          <label><input id="logScale" type="checkbox" /> Log scale</label>
+        </div>
+        <div id="stateYearArea" class="vis"></div>
+
+      </section>
+
+
+
+
+
+
+
+      <!-- B) States choropleth (map) -->
+      <aside class="pure-u-1 pure-u-md-1-3 card" id="section-map">
+        <h2 style="margin-top:0;">States choropleth — % of forest burned</h2>
+        <p class="subtle" style="margin-top:-.4rem">
+          Australia <code>TopoJSON</code> joined to <code>fire_state_year.csv</code> by state and year. Uses the season end year (e.g., 2019–20 → 2020).
+        </p>
+
+        <div class="control">
+          <label for="year">Year:</label>
+          <input id="year" type="range" min="2017" max="2021" step="1" value="2020" style="width:100%" />
+          <div class="subtle">Selected year: <span id="yearLabel">2020</span></div>
+        </div>
+
+        <div id="map" class="vis"></div>
+
+        <p id="mapNote" class="subtle" style="margin:.5rem 0 0">
+          Showing <strong>% of each state's forest area burned (unplanned)</strong> in the selected year.
+        </p>
+      </aside>
+
+    </div><!-- /ROW 1 -->
+
+    <!-- =========================================================
+         ROW 2
+         C) National share (stacked area) — planned vs unplanned
+         ========================================================= -->
+    <section class="pure-u-1 card" style="margin-top:1rem;" id="section-stacked">
+      <h2 style="margin-top:0;">National share of forest burned — planned vs unplanned</h2>
+      <p class="subtle" style="margin-top:-.4rem">
+        Stacked areas show % of Australia’s forest area burned each season, split into planned vs unplanned fire.
+      </p>
+      <div id="stacked" class="vis"></div>
+    </section>
+
+    <section class="pure-u-1 card" style="margin-top:1rem;">
+      <h2 style="margin-top:0;">Key takeaways</h2>
+      <ul class="subtle" style="margin-top:.25rem">
+        <li>2019–20 (shown as 2020) is the largest unplanned burn by area nationally.</li>
+        <li>Planned burns are consistently higher (by area) in WA and NT relative to other states.</li>
+        <li>Use the map for spatial patterns; use the small multiples to see each state’s year-to-year change.</li>
+      </ul>
+    </section>
+
+
+    <!-- =========================================================
+         FOOTER / SOURCES
+         ========================================================= -->
+    <div class="footer">
+      <p><strong>Data:</strong> ABARES “Fires in Australia’s forests 2016–21 (2024)”. Preprocessed to <code>fire_national_year.csv</code> and <code>fire_state_year.csv</code>.</p>
+    </div>
+
+  </main>
+
+  <!-- App entry (ES module that mounts all charts) -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
