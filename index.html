@@ -12,7 +12,7 @@
     h1 { margin:0 0 .25rem 0; font-size: 1.8rem; }
     .subtle { color:#555; }
     .card { background:#fff; border:1px solid #eee; border-radius:12px; padding:1rem; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
-    .vis { width:100%; min-height:340px; }
+    .vis { width:100%; min-height:340px; transition: opacity .25s ease; }
     .vis:empty { min-height:0; padding:0; }
     @media (max-width: 640px){
       .vis { min-height: 260px; }
@@ -21,6 +21,33 @@
     .footer { color:#666; font-size:.9rem; margin-top:2rem; }
     .control { margin:.5rem 0 1rem; }
     .kicker { font-size:.95rem; letter-spacing:.02em; color:#666; margin-bottom:.4rem; text-transform:uppercase; }
+
+    /* light theme base */
+    :root {
+      --bg: #fafafa;
+      --bg-alt: #f3f5f7;   /* pale blue-grey section bg */
+      --card: #ffffff;
+      --line: #e6e6e6;
+    }
+
+    /* alternate section backgrounds */
+    .row-1 { background: var(--bg); }
+    .row-2 { background: var(--bg-alt); }
+    .row-3 { background: var(--bg); }
+
+    /* add a faint dividing line between stacked sections */
+    .row-divider {
+      border: 0;
+      border-top: 1px solid var(--line);
+      margin: 2rem 0;
+    }
+
+    /* soft card shadows + transitions */
+    .card { transition: box-shadow .2s ease, transform .2s ease; }
+    .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-2px); }
+
+    /* tidy section padding if you wrap each row */
+    .section-row { padding: 1rem; border-radius: 12px; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
@@ -32,100 +59,110 @@
       <div class="kicker">FIT3179 • Assignment 2</div>
       <h1>Australia’s Forest Fires (2016–21)</h1>
       <p class="subtle">
-        Australia’s forests experience significant fire activity each year — from planned
-        prescribed burns to large-scale unplanned bushfires. The devastating 2019–20
-        “Black Summer” season alone burned over 8 million hectares of forest,
-        destroying habitats and communities across the continent.
+        Fire is a regular part of Australia’s forest landscape. Each year, agencies conduct planned burning
+        to reduce fuels and protect communities, while unplanned bushfires vary widely with weather and
+        drought. The 2019–20 “Black Summer” season burned millions of hectares of forest, with especially
+        severe impacts in eastern states.
       </p>
       <p class="subtle" style="margin-top:.25rem;">
-        This dashboard visualises data from the
+        This dashboard uses the
         <a href="https://www.agriculture.gov.au/abares/forestsaustralia/forest-data-maps-and-tools/spatial-data/forest-fire" target="_blank">
-          ABARES “Fires in Australia’s forests 2016–21” dataset
-        </a>,
-        showing both the percentage of forest area burned and the total area affected
-        (hectares) by state and year.
+        ABARES “Fires in Australia’s forests 2016–21”</a> dataset to show both the percentage of forest area
+        burned (spatial pattern by state) and the total area affected (hectares). Use the year slider to
+        explore seasons and compare states.
       </p>
     </div>
   </header>
 
-
   <main class="wrap">
 
-    <div class="pure-g" style="gap:1rem;">
+    <!-- =========================================================
+         ROW 1 — Map + Area-by-state (side-by-side)
+         ========================================================= -->
+    <div class="section-row row-1">
+      <div class="pure-g" style="gap:1rem;">
 
+        <!-- States choropleth (map) -->
+        <aside class="pure-u-1 pure-u-md-1-3 card" id="section-map">
+          <h2 style="margin-top:0;">States choropleth, % of forest burned</h2>
+          <p class="subtle" style="margin-top:-.4rem">
+            Australia <code>TopoJSON</code> joined to <code>fire_state_year.csv</code> by state and year. Uses the season end year (e.g., 2019–20 → 2020).
+          </p>
 
-      <!--States choropleth (map) -->
-      <aside class="pure-u-1 pure-u-md-1-3 card" id="section-map">
-        <h2 style="margin-top:0;">States choropleth, % of forest burned</h2>
-        <p class="subtle" style="margin-top:-.4rem">
-          Australia <code>TopoJSON</code> joined to <code>fire_state_year.csv</code> by state and year. Uses the season end year (e.g., 2019–20 → 2020).
-        </p>
+          <div id="map" class="vis"></div>
 
-        <div id="map" class="vis"></div>
-
-        <div class="control" style="margin-top:1rem;">
-          <label for="year">Year:</label>
-          <input id="year" type="range" min="2017" max="2021" step="1" value="2020" style="width:100%" />
-          <div class="subtle" style="text-align:right;">
-            Selected year: <strong><span id="yearLabel">2020</span></strong>
+          <div class="control" style="margin-top:1rem;">
+            <label for="year">Year:</label>
+            <input id="year" type="range" min="2017" max="2021" step="1" value="2020" style="width:100%" />
+            <div class="subtle" style="text-align:right;">
+              Selected year: <strong><span id="yearLabel">2020</span></strong>
+            </div>
           </div>
-        </div>
 
-        <div id="map" class="vis"></div>
+          <p id="mapNote" class="subtle" style="margin:.5rem 0 0">
+            Showing <strong>% of each state's forest area burned (unplanned)</strong> in the selected year.
+          </p>
+          <p class="subtle" style="margin-top:.25rem;">
+            How to read: darker shading indicates a higher proportion of each state’s forest area burned in that season.
+          </p>
+          <p class="subtle" style="margin-top:.25rem;">
+            Method: % = burned forest pixels ÷ total forest pixels for each state.
+          </p>
+        </aside>
 
-        <p id="mapNote" class="subtle" style="margin:.5rem 0 0">
-          Showing <strong>% of each state's forest area burned (unplanned)</strong> in the selected year.
-        </p>
-        <p class="subtle" style="margin-top:.25rem;">
-          Note: Darker shading indicates a higher proportion of each state’s forest area burned in that season.
-        </p>
+        <!-- Area burned by state (grouped bars) -->
+        <section class="pure-u-1 pure-u-md-2-3 card" id="section-statearea">
+          <h2 style="margin-top:0;">Area burned by state</h2>
+          <p class="subtle" style="margin-top:-.4rem">
+            Grouped bars show forest area burned (hectares) per state. Use the year slider on the left.
+          </p>
+          <p class="subtle" id="barYearLabel" style="margin:-.25rem 0 .5rem;">
+            Showing data for <strong>year <span id="barYearValue">2020</span></strong>
+          </p>
+          <div id="stateYearArea" class="vis"></div>
+          <p class="subtle" style="margin-top:.5rem;">
+            How to read: bars compare <em>hectares burned</em> by state, split into unplanned vs planned for the chosen year.
+          </p>
+        </section>
 
-      </aside>
+      </div>
+    </div>
 
-      <p class="subtle" style="margin:.5rem 0 0">
-        Note: percentages are <em>share of each state’s forest area burned</em> in that season
-        (burned forest pixels ÷ total forest pixels for that state).
-      </p>
+    <hr class="row-divider" />
 
-      <!-- A) National trend (line) -->
-      <section class="pure-u-1 pure-u-md-2-3 card" id="section-statearea">
-        <h2 style="margin-top:0;">Area burned by state — selected year</h2>
+    <!-- =========================================================
+         ROW 2 — National share (stacked area)
+         ========================================================= -->
+    <div class="section-row row-2">
+      <section class="pure-u-1 card" id="section-stacked">
+        <h2 style="margin-top:0;">National share of forest burned — planned vs unplanned</h2>
         <p class="subtle" style="margin-top:-.4rem">
-          Grouped bars show forest area burned (hectares) per state. Use the year slider on the right.
+          Stacked areas show % of Australia’s forest area burned each season, split into planned vs unplanned fire.
         </p>
-        <p class="subtle" id="barYearLabel" style="margin:-.25rem 0 .5rem;">
-          Showing data for <strong>year <span id="barYearValue">2020</span></strong>
+        <div id="stacked" class="vis"></div>
+        <p class="subtle" style="margin-top:.5rem;">
+          How to read: the red segment is unplanned bushfire, blue is planned burning; totals represent % of national forest burned each season.
         </p>
-        <div id="stateYearArea" class="vis"></div>
       </section>
+    </div>
 
-    </div><!-- /ROW 1 -->
-
-    <!-- =========================================================
-         ROW 2
-         C) National share (stacked area) — planned vs unplanned
-         ========================================================= -->
-    <section class="pure-u-1 card" style="margin-top:1rem;" id="section-stacked">
-      <h2 style="margin-top:0;">National share of forest burned — planned vs unplanned</h2>
-      <p class="subtle" style="margin-top:-.4rem">
-        Stacked areas show % of Australia’s forest area burned each season, split into planned vs unplanned fire.
-      </p>
-      <div id="stacked" class="vis"></div>
-    </section>
-
-    <section class="pure-u-1 card" style="margin-top:1rem;">
-      <h2 style="margin-top:0;">Key takeaways</h2>
-      <ul class="subtle" style="margin-top:.25rem">
-        <li>2019–20 (shown as 2020) is the largest unplanned burn by area nationally.</li>
-        <li>Planned burns are consistently higher (by area) in WA and NT relative to other states.</li>
-        <li>Use the map for spatial patterns; use the small multiples to see each state’s year-to-year change.</li>
-      </ul>
-    </section>
-
+    <hr class="row-divider" />
 
     <!-- =========================================================
-         FOOTER / SOURCES
+         ROW 3 — Key takeaways
          ========================================================= -->
+    <div class="section-row row-3">
+      <section class="pure-u-1 card">
+        <h2 style="margin-top:0;">Key takeaways</h2>
+        <ul class="subtle" style="margin-top:.25rem">
+          <li><strong>2019–20 (shown as 2020)</strong> is the clear national peak for unplanned fire.</li>
+          <li><strong>NT and Qld</strong> contribute the largest burned area (ha), while <strong>WA/NT</strong> lead in planned burning.</li>
+          <li>Smaller-forest states (e.g., <strong>NSW/Vic</strong>) show high <em>% of forest burned</em> during Black Summer despite smaller total area.</li>
+        </ul>
+      </section>
+    </div>
+
+    <!-- FOOTER / SOURCES -->
     <div class="footer">
       <p><strong>Data:</strong> ABARES “Fires in Australia’s forests 2016–21 (2024)”. Preprocessed to <code>fire_national_year.csv</code> and <code>fire_state_year.csv</code>.</p>
     </div>
