@@ -25,6 +25,7 @@ const mountMap     = (field, yr) => safeEmbed('#map', mapSpec(field, yr));
 const mountStacked = ()          => safeEmbed('#stacked', stackedSpec);
 const mountStateYearArea = (yr) =>
   safeEmbed('#stateYearArea', stateYearAreaByState(yr));
+const barYearLabel = document.getElementById('barYearValue');
 
 
 // initial
@@ -49,10 +50,13 @@ if (yearSlider) {
   yearSlider.addEventListener('input', (e) => {
     currentYear = +e.target.value;
     if (yearLabel) yearLabel.textContent = currentYear;
+    if (barYearLabel) barYearLabel.textContent = currentYear; // new line ✅
+
     mountMap(currentField, currentYear);
     mountStateYearArea(currentYear);
   });
 }
+
 
 if (logChk) {
   logChk.addEventListener('change', () => {
